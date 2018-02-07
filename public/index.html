@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Wolk</title>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Raleway">
+    <link href="/style.css" rel="stylesheet" type="text/css" />
+  </head>
+  <body>
+    <h1 class="title">People REST API</h1>
+    <div id="homepage">
+      <h3>Hire people in your area!</h3>
+      <div id="people">
+      </div>
+    </div>
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+    <script src="https://unpkg.com/react@15/dist/react.js"></script>
+    <script src="https://unpkg.com/react-dom@15/dist/react-dom.min.js"></script>
+
+    <script type="text/babel">
+
+      var People = React.createClass({
+        getInitialState: function(){
+          return({
+            peoples: []
+          })
+        },
+        render: function(){
+          var peoples = this.state.peoples;
+          peoples = peoples.map(function(people, index){
+            return(
+              <li key={index}>
+                <span className={people.obj.available}></span>
+                <span className="name">{people.obj.name}></span>
+                <span className="rank">{people.obj.rank}></span>
+                <span className="dist">{Math.floor(people.dis / 1000)} km></span>
+
+              </li>
+            )
+          });
+          return(
+            <div id="ninja-container">
+              <form id="search" onSubmit={this.handleSubmit}>
+                <label>Enter latitude</label>
+                <input type="text" ref="lat" placeholder="latitude" required />
+                <label>Enter longitude</label>
+                <input type="text" ref="lng" placeholder="longitude" required />
+                <input type="submit" value="Find People" />
+              </form>
+              <ul>{peoples}</ul>
+            </div>
+          )
+        },
+
+        handleSubmit: function(e){
+            e.preventDefault();
+            var lng = this.refs.lng.value;
+            var lat = this.refs.lat.value;
+            fetch('/api/people?lng=' + lng + '&lat=' + lat).then(function(data){
+              return data.json();
+            }).then( json => {
+              this.setState({
+                people: json
+              });
+            });
+        }
+
+      });
+
+      ReactDOM.render(<People />, document.getElementById('people'));
+
+    </script>
+
+  </body>
+</html>
